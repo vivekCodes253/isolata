@@ -21,13 +21,22 @@ class isolata
         Scanner sc = new Scanner(System.in);
         sop("\nEnter path : ");
         path = sc.nextLine();
-        sop("Path is "+path)
+        File file = new File(path);
+        BufferedReader in = new BufferedReader(new FileReader(file)); 
+        String st; 
+        while ((st = br.readLine()) != null) 
+        sop(st); 
+  } 
+
     }
 
+    public static void add(){}
+    
+    public static void newfile(){}
     public static boolean menu()
     {
         int choice;
-        sop("\n1)Extract data\n2)Add data\n3)New file\n4)Exit");
+        sop("\n1)Extract data\n2)Add data\n3)New file\n4)Exit\nEnter choice :");
         Scanner sc = new Scanner(System.in);
         choice = sc.nextInt();
         if(choice==4)
