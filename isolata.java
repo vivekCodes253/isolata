@@ -17,19 +17,28 @@ class isolata
 
     public static void decrypt()
     {
-        String path;
+        String path,key;
+        int keyval;
         File file;
         BufferedReader in;
         Scanner sc = new Scanner(System.in);
         sop("\nEnter path : ");
         path = sc.nextLine();
+        sop("\nEnter key : ");
+        key = sc.nextLine();
+        keyval = getValue(key);                                         //TODO - Keyval function
         file = new File(path);
         try{
             in = new BufferedReader(new FileReader(file)); 
-            String input_string="",st; 
+            String input_string="",st,decrypted_string=""; 
+            int word_counter = 0;
             while ((st = in.readLine()) != null) 
-                input_string += st;
-            
+            {
+                input_string += st;      
+                decrypted_string+=   cae
+                word_counter++;
+
+            }   
         }
         catch(FileNotFoundException ex)
         {
@@ -39,6 +48,9 @@ class isolata
         {
             sop(e+"\n");
         }
+
+        //decryption part
+
     }
 
     public static void add(){}
