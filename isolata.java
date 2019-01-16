@@ -18,16 +18,27 @@ class isolata
     public static void decrypt()
     {
         String path;
+        File file;
+        BufferedReader in;
         Scanner sc = new Scanner(System.in);
         sop("\nEnter path : ");
         path = sc.nextLine();
-        File file = new File(path);
-        BufferedReader in = new BufferedReader(new FileReader(file)); 
-        String st; 
-        while ((st = br.readLine()) != null) 
-        sop(st); 
-  } 
-
+        file = new File(path);
+        try{
+            in = new BufferedReader(new FileReader(file)); 
+            String input_string="",st; 
+            while ((st = in.readLine()) != null) 
+                input_string += st;
+            
+        }
+        catch(FileNotFoundException ex)
+        {
+            sop("\nFile not found, create one or check the path!\n");
+        }
+        catch(Exception e)
+        {
+            sop(e+"\n");
+        }
     }
 
     public static void add(){}
@@ -36,7 +47,7 @@ class isolata
     public static boolean menu()
     {
         int choice;
-        sop("\n1)Extract data\n2)Add data\n3)New file\n4)Exit\nEnter choice :");
+        sop("\n1)Extract data\n2)Add data\n3)New file\n4)Exit\n\nEnter choice : ");
         Scanner sc = new Scanner(System.in);
         choice = sc.nextInt();
         if(choice==4)
