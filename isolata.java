@@ -61,31 +61,40 @@ class isolata
 
     public static String caesar(int enc_dec, int Key, String text)  //1 for enc, -1 for dec
     {
+        Key =Key%26;
         String return_value = "";
         int i;
         for(i=0;i<text.length();i++)
         {
-            return_value += text.charAt(i) + enc_dec*Key;
+            //sop("\n"+text.charAt(i)+" becomes")
+            return_value += (char)(text.charAt(i) + enc_dec*Key);
         }
 
         return return_value;
 
     }
 
-
-    public static void decrypt()
+    public static String decrypt()
     {
         String path,key;
-        int keyval;
-        File file;
-        BufferedReader in;
-        String input_string="",st,decrypted_string=""; 
         Scanner sc = new Scanner(System.in);
         sop("\nEnter path : ");
         path = sc.nextLine();
         sop("\nEnter key : ");
         key = sc.nextLine();
-        keyval = getValue(key);                                         
+          
+        return(decrypt(path,key));
+    }
+
+
+    public static String decrypt(String path, String key)
+    {
+        
+        File file;
+        int keyval;
+        keyval = getValue(key);
+        BufferedReader in;
+        String input_string="",st,decrypted_string=""; 
         file = new File(path);
         try{
             in = new BufferedReader(new FileReader(file)); 
@@ -109,15 +118,41 @@ class isolata
             sop(e+"\n");
         }
 
-        sop("\n"+decrypted_string);
-
+        //sop("\n"+decrypted_string);
+        return(decrypted_string);
         //decryption part
 
     }
 
-    
+    public static String encrypt(String word, String key)
+    {
+        int i, keyval = getValue(key);
+        String return_value = "";
 
-    public static void add(){}
+        return_value = caesar(1,keyval,word);
+        return return_value;
+
+    }
+ 
+
+    public static void add()
+    {
+        String path,newdata,key;
+        int keyval;
+        Scanner sc = new Scanner(System.in);
+        sop("\nEnter path : ");
+        path = sc.nextLine();
+        sop("\nEnter key : ");
+        key = sc.nextLine();
+        keyval = getValue(key); 
+        String data = decrypt(path,key);
+        sop("\nEnter new data : ");
+        newdata = sc.nextLine();
+        //File file = File(path);
+        //file.delete();
+        data = data + newdata;
+        sop(encrypt(data,key));
+    }
     
     public static void newfile(){}
     public static boolean menu()
@@ -129,7 +164,7 @@ class isolata
         if(choice==4)
             return false;
         if(choice == 1)
-            decrypt();
+            sop("\n"+decrypt());
         else if(choice == 2)
             add();
         else
@@ -143,12 +178,15 @@ class isolata
     public static void main(String[] args)
     {
         //sop(rotate(1,"Namaskaram",4)+"");
-        decrypt();
-        /*while(menu())
+        //decrypt();
+        while(menu())
         {
 
-        }*/
-
+        }
+        //sop(caesar(1,getValue("hel"),"not bad"));
+        //caesar(1,"")
+        //sop("\n");
+        //sop(caesar(-1,getValue("hel"),"opu!cbe"));
         
 
     }
