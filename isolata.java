@@ -61,12 +61,14 @@ class isolata
 
     public static String caesar(int enc_dec, int Key, String text)  //1 for enc, -1 for dec
     {
-        Key =Key%26;
+        Key = Key%26;
         String return_value = "";
         int i;
         for(i=0;i<text.length();i++)
         {
             //sop("\n"+text.charAt(i)+" becomes")
+            //int val = text.charAt(i) + enc_dec*Key;
+            
             return_value += (char)(text.charAt(i) + enc_dec*Key);
         }
 
@@ -103,7 +105,7 @@ class isolata
             while ((st = in.readLine()) != null) 
             {
                 input_string += st;     
-                sop(st+ "\n"); 
+                //sop(st+ "\n"); 
                 decrypted_string+=  caesar(-1,keyval,rotate(-1,st,word_counter));
                 word_counter++;
 
@@ -126,7 +128,9 @@ class isolata
 
     public static String encrypt(String word, String key)
     {
+        
         int i, keyval = getValue(key);
+        keyval = keyval%26;
         String return_value = "";
 
         return_value = caesar(1,keyval,word);
@@ -164,7 +168,7 @@ class isolata
         if(choice==4)
             return false;
         if(choice == 1)
-            sop("\n"+decrypt());
+            sop("\n"+decrypt()+"\n");
         else if(choice == 2)
             add();
         else
