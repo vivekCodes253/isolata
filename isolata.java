@@ -106,20 +106,28 @@ class isolata
         int keyval;
         keyval = getValue(key);
         BufferedReader in;
-        String input_string="",st,decrypted_string=""; 
+        String input_string="",str,decrypted_string=""; 
         file = new File(path);
         try{
             in = new BufferedReader(new FileReader(file)); 
             
             int word_counter = 0;
-            while ((st = in.readLine()) != null) 
+            while ((str = in.readLine()) != null) 
             {
-                input_string += st;     
+                input_string += str;     
                 //sop(st+ "\n"); 
-                decrypted_string+=  caesar(-1,keyval,rotate(-1,st,word_counter));
-                word_counter++;
+                //decrypted_string+=  caesar(-1,keyval,rotate(-1,st,word_counter));
+                //word_counter++;
 
             }   
+            StringTokenizer st = new StringTokenizer(input_string);
+            while (st.hasMoreTokens())
+            {
+                decrypted_string += caesar(-1,keyval,rotate(-1,st.nextToken(),word_counter));
+                word_counter++;
+                decrypted_string+=" ";
+            }
+
         }
         catch(FileNotFoundException ex)
         {
@@ -151,6 +159,7 @@ class isolata
            
             return_value += rotate(1,caesar(1,keyval,st.nextToken()),word_counter);
             word_counter++;
+            return_value+=" ";
         }
 
         //return_value = caesar(1,keyval,word);
