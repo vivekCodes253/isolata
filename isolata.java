@@ -14,6 +14,9 @@ class isolata
 {
     public static void sop(String s){System.out.print(s);}
 
+    public static int safe_lower = 48;
+    public static int safe_upper = 125;
+
     public static int getValue(String key)
     {
         int i,return_value=0;
@@ -62,14 +65,20 @@ class isolata
     public static String caesar(int enc_dec, int Key, String text)  //1 for enc, -1 for dec
     {
         Key = Key%26;
+        //sop("\n Key is " + Key);
         String return_value = "";
         int i;
         for(i=0;i<text.length();i++)
         {
-            //sop("\n"+text.charAt(i)+" becomes")
-            //int val = text.charAt(i) + enc_dec*Key;
+            //sop("\n"+text.charAt(i)+" becomes "+(char)(text.charAt(i) + enc_dec*Key));
+            int val = text.charAt(i) + enc_dec*Key;
+
+            if(val>safe_upper)
+                val = val%safe_upper + safe_lower;
+            else if(val<safe_lower)
+                val = val + safe_upper - safe_lower;
             
-            return_value += (char)(text.charAt(i) + enc_dec*Key);
+            return_value += (char)(val);
         }
 
         return return_value;
@@ -181,6 +190,9 @@ class isolata
 
     public static void main(String[] args)
     {
+
+        //Safe range 48 - 125
+
         //sop(rotate(1,"Namaskaram",4)+"");
         //decrypt();
         while(menu())
@@ -191,7 +203,11 @@ class isolata
         //caesar(1,"")
         //sop("\n");
         //sop(caesar(-1,getValue("hel"),"opu!cbe"));
-        
+        /*int i;
+        for(i=1;i<300;i++)
+        {
+            sop("\n"+i+") "+(char)i);
+        }*/
 
     }
 }
