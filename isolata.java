@@ -17,6 +17,7 @@ class isolata
 
     public static int safe_lower = 48;
     public static int safe_upper = 125;
+    public static char space_replacer = ']'; //replace space 
 
     public static int getValue(String key)
     {
@@ -120,7 +121,7 @@ class isolata
                 //word_counter++;
 
             }   
-            StringTokenizer st = new StringTokenizer(input_string);
+            StringTokenizer st = new StringTokenizer(input_string,space_replacer+"");
             while (st.hasMoreTokens())
             {
                 decrypted_string += caesar(-1,keyval,rotate(-1,st.nextToken(),word_counter));
@@ -159,7 +160,7 @@ class isolata
            
             return_value += rotate(1,caesar(1,keyval,st.nextToken()),word_counter);
             word_counter++;
-            return_value+=" ";
+            return_value+=space_replacer;      //using 'á'  as a replacement for space
         }
 
         //return_value = caesar(1,keyval,word);
@@ -224,11 +225,11 @@ class isolata
         //caesar(1,"")
         //sop("\n");
         //sop(caesar(-1,getValue("hel"),"opu!cbe"));
-        /*int i;
+       /* int i;
         for(i=1;i<300;i++)
         {
             sop("\n"+i+") "+(char)i);
-        }*/
-
+        }
+        */
     }
 }
