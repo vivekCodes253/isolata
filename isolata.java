@@ -8,6 +8,7 @@
 
 import java.io.*;
 import java.util.Scanner;
+import java.util.StringTokenizer; 
 
 
 class isolata
@@ -135,14 +136,24 @@ class isolata
 
     }
 
-    public static String encrypt(String word, String key)
+
+    public static String encrypt(String data, String key)       //Inefficient way, reencrypt everything
     {
         
         int i, keyval = getValue(key);
         keyval = keyval%26;
         String return_value = "";
 
-        return_value = caesar(1,keyval,word);
+        StringTokenizer st = new StringTokenizer(data);
+        int word_counter = 0;
+        while (st.hasMoreTokens())
+        {
+           
+            return_value += rotate(1,caesar(1,keyval,st.nextToken()),word_counter);
+            word_counter++;
+        }
+
+        //return_value = caesar(1,keyval,word);
         return return_value;
 
     }
@@ -179,6 +190,7 @@ class isolata
         if(choice == 1)
             sop("\n"+decrypt()+"\n");
         else if(choice == 2)
+           // encrypt();
             add();
         else
             newfile();
