@@ -13,44 +13,44 @@ import java.util.StringTokenizer;
 
 class isolata
 {
-    public static void sop(String s){System.out.print(s);}
-
     public static int safe_lower = 48;
     public static int safe_upper = 125;
     public static char space_replacer = ']'; //replace space 
+    public static String newline_replacer = "--00--"; //replace newline
+    public static String data_store_path = "data.txt";
 
+    /*Function Name : sop
+    Purpose         : Simplifies System.out.print()
+    Input           : String to output
+    Return          : --    */
+    public static void sop(String s){System.out.print(s);}
+
+    
+    /*Function Name : getValue
+    Purpose         : Generates the sum of characters in int and mod by the safe range for a numeric key representation
+    Input           : The key in String format
+    Return          : Generated sum modded by safe range value  */
     public static int getValue(String key)
     {
         int i,return_value=0;
         for(i=0;i<key.length();i++)
             return_value += key.charAt(i);
-
+        return_value = return_value%(safe_upper-safe_lower);
         return return_value;
     }
 
-    public static String rotate(int direction, String word, int rotate_value)   //-1 = left 1 = right
+
+    /*Function Name : rotate
+    Purpose         : Rotates string left or right
+    Input           : direction (-1 left rotation, 1 right rotation), word - input string, rotate_value - amount of rotation
+    Return          : Rotated string    */
+    public static String rotate(int direction, String word, int rotate_value)   
     {
         String return_value ="";
         int i;
         rotate_value = rotate_value % word.length();
         if(rotate_value == 0)
             return word;
-        /*
-        if(direction == -1)
-        {
-            for(i=rotate_value;i<word.length();i++)
-                return_value += word.charAt(i);
-            for(i=0;i<rotate_value;i++)
-                return_value += word.charAt(i);
-        }
-        else
-        {
-            for(i=word.length()-rotate_value;i<word.length();i++)
-                return_value += word.charAt(i);
-            for(i=0;i<word.length()-rotate_value;i++)
-                return_value += word.charAt(i);
-        }*/
-        //Above can be reduced
         int startval;
         if(direction == -1)
             startval = rotate_value; 
@@ -64,131 +64,186 @@ class isolata
         return return_value;
     }
 
-    public static String caesar(int enc_dec, int Key, String text)  //1 for enc, -1 for dec
+
+    /*Function Name : caesar
+    Purpose         : Does caesar cipher shift within the safe_range
+    Input           : enc_dec (1 for encoding : increments character value, -1 for decoding, decrements character value), key - shifting value, text - input string
+    Return          : caesar cipher text    */
+    public static String caesar(int enc_dec, int Key, String text)  
     {
-        Key = Key%26;
-        //sop("\n Key is " + Key);
         String return_value = "";
         int i;
         for(i=0;i<text.length();i++)
         {
-            //sop("\n"+text.charAt(i)+" becomes "+(char)(text.charAt(i) + enc_dec*Key));
             int val = text.charAt(i) + enc_dec*Key;
-
             if(val>safe_upper)
                 val = val%safe_upper + safe_lower;
             else if(val<safe_lower)
-                val = val + safe_upper - safe_lower;
-            
+                val = val + safe_upper - safe_lower;  
             return_value += (char)(val);
         }
-
         return return_value;
-
     }
 
+
+    /*Function Name : decrypt
+    Purpose         : Accepts path and key to call the main decrypt function
+    Input           : User input of path and key
+    Return          : Value returned by the main decrypt function    */
     public static String decrypt()
     {
         String path,key;
         Scanner sc = new Scanner(System.in);
-        sop("\nEnter path : ");
-        path = sc.nextLine();
+        //sop("\nEnter path : ");
+        //path = sc.nextLine();
+        path = data_store_path;
         sop("\nEnter key : ");
-        key = sc.nextLine();
-          
-        return(decrypt(path,key));
+        key = sc.nextLine();        
+        return(decrypt(path,key,true));
     }
+    
 
-
-    public static String decrypt(String path, String key)
+    /*Function Name : decrypt
+    Purpose         : Read data from file, decrypt using the rotate and caesar scheme
+    Input           : path - path to datafile, key - String key to decrypt
+    Return          : Decrypted string  or error message   */
+    public static String decrypt(String path, String key, boolean return_for_display)
     {
         
         File file;
         int keyval;
         keyval = getValue(key);
         BufferedReader in;
-        String input_string="",str,decrypted_string=""; 
+        String input_string="",str,decrypted_string="",decrypted_string_display=""; 
         file = new File(path);
         try{
             in = new BufferedReader(new FileReader(file)); 
-            
             int word_counter = 0;
             while ((str = in.readLine()) != null) 
             {
                 input_string += str;     
-                //sop(st+ "\n"); 
-                //decrypted_string+=  caesar(-1,keyval,rotate(-1,st,word_counter));
-                //word_counter++;
-
+                //sop("\nReading "+str);
             }   
             StringTokenizer st = new StringTokenizer(input_string,space_replacer+"");
             while (st.hasMoreTokens())
             {
-                decrypted_string += caesar(-1,keyval,rotate(-1,st.nextToken(),word_counter));
-                word_counter++;
-                decrypted_string+=" ";
+                String tval =st.nextToken();
+                //sop("\n Token" + tval+"");
+                if(!tval.equals(newline_replacer))
+                {
+                    String caesarop = caesar(-1,keyval,rotate(-1,tval,word_counter));;
+                    decrypted_string += caesarop;
+                    decrypted_string_display += caesarop;
+                    word_counter++;
+                    decrypted_string+=" ";
+                    decrypted_string_display+=" ";
+                }
+                else
+                {
+                    //sop("\nLine break");
+                    decrypted_string_display+="\n";
+                }
             }
-
         }
         catch(FileNotFoundException ex)
         {
-            sop("\nFile not found, create one or check the path!\n");
+            return("\nFile not found, create one or check the path!\n");
         }
         catch(Exception e)
         {
-            sop(e+"\n");
+            return(e+"\n");
         }
-
-        //sop("\n"+decrypted_string);
-        return(decrypted_string);
-        //decryption part
-
+        if(return_for_display)
+            return(decrypted_string_display);
+        else    
+            return(decrypted_string);
     }
 
 
-    public static String encrypt(String data, String key)       //Inefficient way, reencrypt everything
-    {
-        
-        int i, keyval = getValue(key);
-        keyval = keyval%26;
+    /*Function Name : encrypt
+    Purpose         : To encryot using the rotate+caesar scheme reading word by word, also appends special character to replace space
+    Input           : data - String to encrypt, key - String key to encrypt
+    Return          : Encrypted string    
+    Comments        : Slightly inefficient to read and reencrypt everything again
+    TODO            : Fix the comment issue*/
+    public static String encrypt(String data, String key)       
+    {    
+        int i, keyval = getValue(key),word_counter = 0;
         String return_value = "";
-
         StringTokenizer st = new StringTokenizer(data);
-        int word_counter = 0;
         while (st.hasMoreTokens())
-        {
-           
+        {           
             return_value += rotate(1,caesar(1,keyval,st.nextToken()),word_counter);
             word_counter++;
-            return_value+=space_replacer;      //using 'á'  as a replacement for space
+            return_value+=space_replacer;      
         }
-
-        //return_value = caesar(1,keyval,word);
         return return_value;
-
     }
  
-
-    public static void add()
+    /*Function Name : add
+    Purpose         : To read from an already encrypted file and append more encrypted data
+    Input           : --
+    Return          : Success message or the error report as string    
+    TODO            : Work on this function, proper input and output options, note sequence of operations, file not found must be prompt*/
+    public static String add()
     {
         String path,newdata,key;
+        File file;
+        BufferedWriter writer;
         int keyval;
         Scanner sc = new Scanner(System.in);
-        sop("\nEnter path : ");
-        path = sc.nextLine();
+        //sop("\nEnter path : ");
+        //path = sc.nextLine();
+        path = data_store_path;
+        try{
+            //file = new File(path);
+            writer = new BufferedWriter(new FileWriter(path,true));
+        }
+        catch(FileNotFoundException ex)
+        {
+            return("\nFile not found, create one or check the path!\n");
+        }
+        catch(Exception e)
+        {
+            return(""+e);
+        }
         sop("\nEnter key : ");
         key = sc.nextLine();
         keyval = getValue(key); 
-        String data = decrypt(path,key);
+        String data = decrypt(path,key,false);
         sop("\nEnter new data : ");
         newdata = sc.nextLine();
+        
         //File file = File(path);
         //file.delete();
+        int old_length = data.length();
         data = data + newdata;
-        sop(encrypt(data,key));
+        
+        //sop(encrypt(data,key));
+        try{           
+            writer.write(""+encrypt(data,key).substring(old_length));
+            writer.write(newline_replacer+space_replacer);
+            writer.close();
+
+        }
+        catch(Exception e)
+        {
+            return(""+e);
+        }     
+
+        return "Successfully appended!";  
     }
     
+    /*Function Name : newfile
+    Purpose         : 
+    Input           : 
+    Return          :     */
     public static void newfile(){}
+
+    /*Function Name : menu
+    Purpose         : Display menu, get user choice and perform operation
+    Input           : 
+    Return          : True if menu needs to be displayed again, false if exit condition    */
     public static boolean menu()
     {
         int choice;
@@ -200,11 +255,9 @@ class isolata
         if(choice == 1)
             sop("\n"+decrypt()+"\n");
         else if(choice == 2)
-           // encrypt();
-            add();
+            sop("\n"+add()+"\n");
         else
             newfile();
-
 
         return true;
 
