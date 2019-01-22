@@ -11,13 +11,15 @@ import java.util.Scanner;
 import java.util.StringTokenizer; 
 
 
-class isolata
+public class isolata
 {
     public static int safe_lower = 48;
     public static int safe_upper = 125;
     public static char space_replacer = ']'; //replace space 
     public static String newline_replacer = "--00--"; //replace newline
     public static String data_store_path = "data.txt";
+    //---------IO
+    public static Scanner sc;
 
     /*Function Name : sop
     Purpose         : Simplifies System.out.print()
@@ -25,12 +27,41 @@ class isolata
     Return          : --    */
     public static void sop(String s){System.out.print(s);}
 
+
+    /*Function Name : getUserData  [i/o operation]
+    Purpose         : Get user data 
+    Input           : --
+    Return          : String tring accepted from the user  */
+    public static String getUserData(String message)
+    {
+        Scanner sc = new Scanner(System.in);
+        sop("\n"+message);
+        String return_value = sc.nextLine();
+        return(return_value);
+    }
+
+    public static String getUserData()
+    {   
+        return(getUserData("\nEnter new data : "));
+    }
+
     
-    /*Function Name : getValue
+    /*Function Name : getKeyString  [i/o operation]
+    Purpose         : Gets the key string from user 
+    Input           : --
+    Return          : Key string accepted from the user  */
+    public static String getKeyString()
+    {
+        return(getUserData("\nEnter key : "));   
+    }
+
+
+    
+    /*Function Name : getKeyValue
     Purpose         : Generates the sum of characters in int and mod by the safe range for a numeric key representation
     Input           : The key in String format
     Return          : Generated sum modded by safe range value  */
-    public static int getValue(String key)
+    public static int getKeyValue(String key)
     {
         int i,return_value=0;
         for(i=0;i<key.length();i++)
@@ -60,7 +91,6 @@ class isolata
                 return_value += word.charAt(i);
         for(i=0;i<startval;i++)
                 return_value += word.charAt(i);
-
         return return_value;
     }
 
@@ -93,12 +123,9 @@ class isolata
     public static String decrypt()
     {
         String path,key;
-        Scanner sc = new Scanner(System.in);
-        //sop("\nEnter path : ");
-        //path = sc.nextLine();
         path = data_store_path;
-        sop("\nEnter key : ");
-        key = sc.nextLine();        
+        key = getKeyString();
+
         return(decrypt(path,key,true));
     }
     
@@ -112,7 +139,7 @@ class isolata
         
         File file;
         int keyval;
-        keyval = getValue(key);
+        keyval = getKeyValue(key);
         BufferedReader in;
         String input_string="",str,decrypted_string="",decrypted_string_display=""; 
         file = new File(path);
@@ -122,13 +149,11 @@ class isolata
             while ((str = in.readLine()) != null) 
             {
                 input_string += str;     
-                //sop("\nReading "+str);
             }   
             StringTokenizer st = new StringTokenizer(input_string,space_replacer+"");
             while (st.hasMoreTokens())
             {
                 String tval =st.nextToken();
-                //sop("\n Token" + tval+"");
                 if(!tval.equals(newline_replacer))
                 {
                     String caesarop = caesar(-1,keyval,rotate(-1,tval,word_counter));;
@@ -140,7 +165,6 @@ class isolata
                 }
                 else
                 {
-                    //sop("\nLine break");
                     decrypted_string_display+="\n";
                 }
             }
@@ -168,7 +192,7 @@ class isolata
     TODO            : Fix the comment issue*/
     public static String encrypt(String data, String key)       
     {    
-        int i, keyval = getValue(key),word_counter = 0;
+        int i, keyval = getKeyValue(key),word_counter = 0;
         String return_value = "";
         StringTokenizer st = new StringTokenizer(data);
         while (st.hasMoreTokens())
@@ -191,12 +215,8 @@ class isolata
         File file;
         BufferedWriter writer;
         int keyval;
-        Scanner sc = new Scanner(System.in);
-        //sop("\nEnter path : ");
-        //path = sc.nextLine();
         path = data_store_path;
         try{
-            //file = new File(path);
             writer = new BufferedWriter(new FileWriter(path,true));
         }
         catch(FileNotFoundException ex)
@@ -207,24 +227,16 @@ class isolata
         {
             return(""+e);
         }
-        sop("\nEnter key : ");
-        key = sc.nextLine();
-        keyval = getValue(key); 
+        key = getKeyString();
+        keyval = getKeyValue(key); 
         String data = decrypt(path,key,false);
-        sop("\nEnter new data : ");
-        newdata = sc.nextLine();
-        
-        //File file = File(path);
-        //file.delete();
+        newdata = getUserData();
         int old_length = data.length();
         data = data + newdata;
-        
-        //sop(encrypt(data,key));
         try{           
             writer.write(""+encrypt(data,key).substring(old_length));
             writer.write(newline_replacer+space_replacer);
             writer.close();
-
         }
         catch(Exception e)
         {
@@ -240,6 +252,7 @@ class isolata
     Return          :     */
     public static void newfile(){}
 
+
     /*Function Name : menu
     Purpose         : Display menu, get user choice and perform operation
     Input           : 
@@ -247,9 +260,8 @@ class isolata
     public static boolean menu()
     {
         int choice;
-        sop("\n1)Extract data\n2)Add data\n3)New file\n4)Exit\n\nEnter choice : ");
-        Scanner sc = new Scanner(System.in);
-        choice = sc.nextInt();
+        sop("\n1)Extract data\n2)Add data\n3)New file\n4)Exit");
+        choice = Integer.valueOf(getUserData("Enter choice : "));
         if(choice==4)
             return false;
         if(choice == 1)
@@ -263,22 +275,25 @@ class isolata
 
     }
 
+
+    /*Function Name : init
+    Purpose         : initialise global variables
+    Input           : --
+    Return          : --    */
+    public static void init()
+    {
+        Scanner sc = new Scanner(System.in);
+    }
+
     public static void main(String[] args)
     {
 
-        //Safe range 48 - 125
-
-        //sop(rotate(1,"Namaskaram",4)+"");
-        //decrypt();
+        init();
         while(menu())
         {
 
         }
-        //sop(caesar(1,getValue("hel"),"not bad"));
-        //caesar(1,"")
-        //sop("\n");
-        //sop(caesar(-1,getValue("hel"),"opu!cbe"));
-       /* int i;
+    /*
         for(i=1;i<300;i++)
         {
             sop("\n"+i+") "+(char)i);
