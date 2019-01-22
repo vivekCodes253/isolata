@@ -17,7 +17,7 @@ public class isolata
     public static int safe_upper = 125;
     public static char space_replacer = ']'; //replace space 
     public static String newline_replacer = "--00--"; //replace newline
-    public static String data_store_path = "data.txt";
+    public static String data_store_path = "data";
     //---------IO
     public static Scanner sc;
 
@@ -125,7 +125,6 @@ public class isolata
         String path,key;
         path = data_store_path;
         key = getKeyString();
-
         return(decrypt(path,key,true));
     }
     
@@ -135,8 +134,7 @@ public class isolata
     Input           : path - path to datafile, key - String key to decrypt
     Return          : Decrypted string  or error message   */
     public static String decrypt(String path, String key, boolean return_for_display)
-    {
-        
+    {   
         File file;
         int keyval;
         keyval = getKeyValue(key);
@@ -203,6 +201,7 @@ public class isolata
         }
         return return_value;
     }
+
  
     /*Function Name : add
     Purpose         : To read from an already encrypted file and append more encrypted data
@@ -242,10 +241,10 @@ public class isolata
         {
             return(""+e);
         }     
-
         return "Successfully appended!";  
     }
     
+
     /*Function Name : newfile
     Purpose         : 
     Input           : 
@@ -270,9 +269,7 @@ public class isolata
             sop("\n"+add()+"\n");
         else
             newfile();
-
         return true;
-
     }
 
 
@@ -283,11 +280,20 @@ public class isolata
     public static void init()
     {
         Scanner sc = new Scanner(System.in);
+        try
+        {
+            File database = new File(data_store_path);
+            database.createNewFile(); 
+        }
+        catch(Exception e)
+        {
+            sop(e+"");
+        }
+        
     }
 
     public static void main(String[] args)
     {
-
         init();
         while(menu())
         {
