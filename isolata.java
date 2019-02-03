@@ -6,6 +6,9 @@
 //Rotate left progressively
 
 
+//NEW task - add file selection
+
+
 import java.io.*;
 import java.util.Scanner;
 import java.util.StringTokenizer; 
@@ -15,17 +18,82 @@ public class isolata
 {
     public static int safe_lower = 48;
     public static int safe_upper = 125;
-    public static char space_replacer = ']'; //replace space 
-    public static String newline_replacer = "--00--"; //replace newline
-    public static String data_store_path = "data";
+    public static String space_replacer = "]"; //replace space 
+    public static String newline_replacer = "{}"; //replace newline
+    public static String default_data_store_path = "data";
+    public static String data_store_path = "";
+    public static String data_store_paths_directory = "dir";
+    public static String file_cache = "";
+    public boolean current_file_has_changed = false;
     //---------IO
     public static Scanner sc;
 
-    /*Function Name : sop
+    /*Function Name : sop [i/o operation]
     Purpose         : Simplifies System.out.print()
     Input           : String to output
     Return          : --    */
     public static void sop(String s){System.out.print(s);}
+
+
+    /*Function Name : fileread [file operation]
+    Purpose         : read data from file
+    Input           : filepath
+    Return          : Read message or status    */
+    public static String fileread(String filepath)
+    {
+        File file = new File(filepath);
+        String str, read_string = "";
+        try{
+            BufferedReader in = new BufferedReader(new FileReader(file)); 
+            while ((str = in.readLine()) != null) 
+            {
+                read_string += str;     
+            }   
+        }
+
+        catch(FileNotFoundException ex)
+        {
+            return("\nFile not found, create one or check the path!\n");
+        }
+        catch(Exception e)
+        {
+            return(e+"\n");
+        }
+        return read_string;
+    }
+
+    /*Function Name : filewrite [file operation]
+    Purpose         : write string into file
+    Input           : filepath, data string and a boolean whether to overwrite or not, not means append
+    Return          : Status    */
+    public static String filewrite(String filepath, String data, boolean overwrite)
+    {
+        File file;
+        BufferedWriter writer;   
+        try{
+            writer = new BufferedWriter(new FileWriter(filepath,!overwrite));
+        }
+        catch(FileNotFoundException ex)
+        {
+            return("\nFile not found, create one or check the path!\n");
+        }
+        catch(Exception e)
+        {
+            return(""+e);
+        }
+        try{           
+            writer.write(data);
+            writer.close();
+        }
+        catch(Exception e)
+        {
+            return(""+e);
+        }     
+        return "Successfully appended!"; 
+    }
+
+
+
 
 
     /*Function Name : getUserData  [i/o operation]
@@ -116,69 +184,49 @@ public class isolata
     }
 
 
-    /*Function Name : decrypt
-    Purpose         : Accepts path and key to call the main decrypt function
+    /*Function Name : extractt  includes io operations
+    Purpose         : Accepts path and key to call the main extract function
     Input           : User input of path and key
-    Return          : Value returned by the main decrypt function    */
-    public static String decrypt()
+    Return          : Value returned by the main extract function    */
+    public static String extract()
     {
         String path,key;
         path = data_store_path;
         key = getKeyString();
-        return(decrypt(path,key,true));
+        return(extract(path,key));
     }
     
 
-    /*Function Name : decrypt
+    /*Function Name : extract
     Purpose         : Read data from file, decrypt using the rotate and caesar scheme
     Input           : path - path to datafile, key - String key to decrypt
     Return          : Decrypted string  or error message   */
-    public static String decrypt(String path, String key, boolean return_for_display)
+    public static String extract(String path, String key)
     {   
-        File file;
-        int keyval;
-        keyval = getKeyValue(key);
-        BufferedReader in;
-        String input_string="",str,decrypted_string="",decrypted_string_display=""; 
-        file = new File(path);
-        try{
-            in = new BufferedReader(new FileReader(file)); 
-            int word_counter = 0;
-            while ((str = in.readLine()) != null) 
-            {
-                input_string += str;     
-            }   
-            StringTokenizer st = new StringTokenizer(input_string,space_replacer+"");
-            while (st.hasMoreTokens())
-            {
-                String tval =st.nextToken();
-                if(!tval.equals(newline_replacer))
-                {
-                    String caesarop = caesar(-1,keyval,rotate(-1,tval,word_counter));;
-                    decrypted_string += caesarop;
-                    decrypted_string_display += caesarop;
-                    word_counter++;
-                    decrypted_string+=" ";
-                    decrypted_string_display+=" ";
-                }
-                else
-                {
-                    decrypted_string_display+="\n";
-                }
-            }
-        }
-        catch(FileNotFoundException ex)
+        String decrypted_string="";    
+        decrypted_string = decrypt(fileread(path),key);
+        return(decrypted_string);
+    }
+
+    public static void fileSelector()
+    {
+        int choice;
+        sop("\n1)Select file\n2)Create and use new file\n3)Use default");
+        choice = Integer.valueOf(getUserData("Enter choice : "));
+        if(choice==1)
         {
-            return("\nFile not found, create one or check the path!\n");
+            // need a general file to keep track of all available files? or simply read out dat files??
         }
-        catch(Exception e)
+        else if(choice == 2)
         {
-            return(e+"\n");
+
         }
-        if(return_for_display)
-            return(decrypted_string_display);
-        else    
-            return(decrypted_string);
+        else
+        {
+
+        }
+        // What if file doesnt exist force create
+        sop(choice+"\n");
     }
 
 
@@ -186,8 +234,7 @@ public class isolata
     Purpose         : To encryot using the rotate+caesar scheme reading word by word, also appends special character to replace space
     Input           : data - String to encrypt, key - String key to encrypt
     Return          : Encrypted string    
-    Comments        : Slightly inefficient to read and reencrypt everything again
-    TODO            : Fix the comment issue*/
+    Comments        : Slightly inefficient to read and reencrypt everything again*/
     public static String encrypt(String data, String key)       
     {    
         int i, keyval = getKeyValue(key),word_counter = 0;
@@ -202,6 +249,32 @@ public class isolata
         return return_value;
     }
 
+    /*Function Name : decrypt
+    Purpose         : To decrypt using the rotate+caesar scheme reading word by word, also appends special character to replace space
+    Input           : data - String to decrypt, key - String key to decrypt
+    Return          : Encrypted string*/
+    public static String decrypt(String data, String key)
+    {
+        int i, keyval = getKeyValue(key),word_counter = 0;
+        String return_value = "",temp ="";
+        StringTokenizer st = new StringTokenizer(data,space_replacer);
+        while (st.hasMoreTokens())
+        {   
+            temp = st.nextToken();
+            
+            if(temp.equals(newline_replacer))
+                return_value+="\n";
+            else
+            { 
+                return_value += caesar(-1,keyval,rotate(-1,temp,word_counter));
+                word_counter++;
+                if(st.hasMoreTokens())
+                    return_value+=" "; 
+            }                 
+        }
+        return return_value;
+    }
+
  
     /*Function Name : add
     Purpose         : To read from an already encrypted file and append more encrypted data
@@ -211,39 +284,15 @@ public class isolata
     public static String add()
     {
         String path,newdata,key;
-        File file;
-        BufferedWriter writer;
-        int keyval;
         path = data_store_path;
-        try{
-            writer = new BufferedWriter(new FileWriter(path,true));
-        }
-        catch(FileNotFoundException ex)
-        {
-            return("\nFile not found, create one or check the path!\n");
-        }
-        catch(Exception e)
-        {
-            return(""+e);
-        }
-        key = getKeyString();
-        keyval = getKeyValue(key); 
-        String data = decrypt(path,key,false);
+        key = getKeyString(); 
+        String data = extract(path,key).replaceAll("\n","");
         newdata = getUserData();
         int old_length = data.length();
+        String old_data = data;
         data = data + newdata;
-        try{           
-            writer.write(""+encrypt(data,key).substring(old_length));
-            writer.write(newline_replacer+space_replacer);
-            writer.close();
-        }
-        catch(Exception e)
-        {
-            return(""+e);
-        }     
-        return "Successfully appended!";  
+        return filewrite(path,(""+(encrypt(data,key)).substring(old_length)+space_replacer+newline_replacer+space_replacer),false);
     }
-    
 
     /*Function Name : newfile
     Purpose         : 
@@ -264,17 +313,17 @@ public class isolata
         if(choice==4)
             return false;
         if(choice == 1)
-            sop("\n"+decrypt()+"\n");
+            sop("\n"+extract()+"\n");
         else if(choice == 2)
             sop("\n"+add()+"\n");
         else
-            newfile();
+            fileSelector();
         return true;
     }
 
 
     /*Function Name : init
-    Purpose         : initialise global variables
+    Purpose         : initialise global variables and create basic files (directory for list of files, and creates default path)
     Input           : --
     Return          : --    */
     public static void init()
@@ -282,28 +331,32 @@ public class isolata
         Scanner sc = new Scanner(System.in);
         try
         {
-            File database = new File(data_store_path);
-            database.createNewFile(); 
+            File directory = new File(data_store_paths_directory);
+            directory.createNewFile(); 
+            directory = new File(default_data_store_path);
+            directory.createNewFile(); 
+
         }
         catch(Exception e)
         {
             sop(e+"");
         }
+
+        data_store_path = default_data_store_path;
         
     }
 
+    
+
     public static void main(String[] args)
     {
-        init();
+        //init();
+        data_store_path = default_data_store_path;
+        //fileSelector();
         while(menu())
         {
 
         }
-    /*
-        for(i=1;i<300;i++)
-        {
-            sop("\n"+i+") "+(char)i);
-        }
-        */
+    
     }
 }
