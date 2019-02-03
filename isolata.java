@@ -4,15 +4,11 @@
 //Caesar up by sum fof keys
 //Decyption : Caesar down by sum of key %26
 //Rotate left progressively
-
-
 //NEW task - add file selection
-
 
 import java.io.*;
 import java.util.Scanner;
 import java.util.StringTokenizer; 
-
 
 public class isolata
 {
@@ -22,7 +18,6 @@ public class isolata
     public static String newline_replacer = "{}"; //replace newline
     public static String default_data_store_path = "data";
     public static String data_store_path = "";
-    public static String data_store_paths_directory = "dir";
     public static String file_cache = "";
     public boolean current_file_has_changed = false;
     //---------IO
@@ -33,7 +28,6 @@ public class isolata
     Input           : String to output
     Return          : --    */
     public static void sop(String s){System.out.print(s);}
-
 
     /*Function Name : fileread [file operation]
     Purpose         : read data from file
@@ -93,9 +87,6 @@ public class isolata
     }
 
 
-
-
-
     /*Function Name : getUserData  [i/o operation]
     Purpose         : Get user data 
     Input           : --
@@ -113,7 +104,6 @@ public class isolata
         return(getUserData("\nEnter new data : "));
     }
 
-    
     /*Function Name : getKeyString  [i/o operation]
     Purpose         : Gets the key string from user 
     Input           : --
@@ -122,8 +112,6 @@ public class isolata
     {
         return(getUserData("\nEnter key : "));   
     }
-
-
     
     /*Function Name : getKeyValue
     Purpose         : Generates the sum of characters in int and mod by the safe range for a numeric key representation
@@ -137,7 +125,6 @@ public class isolata
         return_value = return_value%(safe_upper-safe_lower);
         return return_value;
     }
-
 
     /*Function Name : rotate
     Purpose         : Rotates string left or right
@@ -183,8 +170,7 @@ public class isolata
         return return_value;
     }
 
-
-    /*Function Name : extractt  includes io operations
+    /*Function Name : extract includes io operations
     Purpose         : Accepts path and key to call the main extract function
     Input           : User input of path and key
     Return          : Value returned by the main extract function    */
@@ -196,7 +182,6 @@ public class isolata
         return(extract(path,key));
     }
     
-
     /*Function Name : extract
     Purpose         : Read data from file, decrypt using the rotate and caesar scheme
     Input           : path - path to datafile, key - String key to decrypt
@@ -208,27 +193,28 @@ public class isolata
         return(decrypted_string);
     }
 
+    /*Function Name : fileselector
+    Purpose         : Select a file to write data onto or use the default
+    Input           : --
+    Return          : --   */
     public static void fileSelector()
     {
         int choice;
-        sop("\n1)Select file\n2)Create and use new file\n3)Use default");
+        String filename;
+        data_store_path = default_data_store_path;
+        sop("\n1) Enter custom file [creates file if it doesnt exist] \n2) Use default");
         choice = Integer.valueOf(getUserData("Enter choice : "));
         if(choice==1)
         {
-            // need a general file to keep track of all available files? or simply read out dat files??
+            filename = getUserData("\nEnter file name : ");
+            if(newfile(filename))
+                data_store_path = filename;
+            else    
+                sop("Error creating file");
         }
-        else if(choice == 2)
-        {
-
-        }
-        else
-        {
-
-        }
-        // What if file doesnt exist force create
-        sop(choice+"\n");
+    
+        
     }
-
 
     /*Function Name : encrypt
     Purpose         : To encryot using the rotate+caesar scheme reading word by word, also appends special character to replace space
@@ -275,7 +261,6 @@ public class isolata
         return return_value;
     }
 
- 
     /*Function Name : add
     Purpose         : To read from an already encrypted file and append more encrypted data
     Input           : --
@@ -295,11 +280,23 @@ public class isolata
     }
 
     /*Function Name : newfile
-    Purpose         : 
-    Input           : 
-    Return          :     */
-    public static void newfile(){}
+    Purpose         : makes a new file in the current working directory
+    Input           : filename
+    Return          : status of creation   */
+    public static Boolean newfile(String name)
+    {
+        try
+        {
+            File myFile = new File(name);
+            myFile.createNewFile();
+        }
+        catch(Exception e)
+        {
+            return(false);
+        }
 
+        return true; 
+    }
 
     /*Function Name : menu
     Purpose         : Display menu, get user choice and perform operation
@@ -321,42 +318,20 @@ public class isolata
         return true;
     }
 
-
     /*Function Name : init
     Purpose         : initialise global variables and create basic files (directory for list of files, and creates default path)
     Input           : --
     Return          : --    */
     public static void init()
-    {
-        Scanner sc = new Scanner(System.in);
-        try
-        {
-            File directory = new File(data_store_paths_directory);
-            directory.createNewFile(); 
-            directory = new File(default_data_store_path);
-            directory.createNewFile(); 
-
-        }
-        catch(Exception e)
-        {
-            sop(e+"");
-        }
-
-        data_store_path = default_data_store_path;
-        
+    { 
+        newfile(default_data_store_path); 
+        data_store_path = default_data_store_path;       
     }
-
-    
 
     public static void main(String[] args)
     {
-        //init();
-        data_store_path = default_data_store_path;
-        //fileSelector();
-        while(menu())
-        {
-
-        }
-    
+        init();
+        fileSelector();
+        while(menu()){}   
     }
 }
